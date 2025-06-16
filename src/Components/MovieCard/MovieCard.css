@@ -1,0 +1,80 @@
+/* Custom CSS for MovieCard component */
+
+.movie-card {
+    background-color: #f0f8ff; /* Light blue background */
+    padding: 1.5rem; /* Padding all around */
+    border-radius: 1rem; /* Rounded corners */
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Soft shadow */
+    transition: box-shadow 0.3s ease-in-out; /* Smooth transition for hover effect */
+    border: 1px solid #bfdbfe; /* Light blue border */
+    display: flex; /* Use flexbox for layout */
+    flex-direction: column; /* Stack items vertically */
+    align-items: center; /* Center items horizontally */
+    text-align: center; /* Center text */
+}
+
+.movie-card:hover {
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); /* Larger shadow on hover */
+}
+
+.movie-card-poster {
+    border-radius: 0.5rem; /* Rounded corners for the image */
+    margin-bottom: 1rem; /* Space below the image */
+    width: 100%; /* Image takes full width of its container */
+    height: auto; /* Maintain aspect ratio */
+    max-width: 12.5rem; /* Max width for the poster */
+    object-fit: cover; /* Cover the area, cropping if necessary */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* Shadow for the poster */
+}
+
+.movie-card-poster-fallback {
+    border-radius: 0.5rem; /* Rounded corners for the fallback div */
+    margin-bottom: 1rem; /* Space below the fallback div */
+    width: 100%; /* Takes full width */
+    height: auto; /* Auto height, but set a min-height to match posters */
+    max-width: 12.5rem; /* Max width to match poster size */
+    display: flex; /* Flexbox for centering text */
+    align-items: center; /* Center text vertically */
+    justify-content: center; /* Center text horizontally */
+    background-color: #e5e7eb; /* Light gray background */
+    color: #6b7280; /* Gray text color */
+    font-size: 1.125rem; /* Larger font size */
+    font-weight: 600; /* Semi-bold font */
+    height: 18.75rem; /* Fixed height to make it consistent with image size */
+}
+
+.movie-card-title {
+    font-size: 1.25rem; /* Large font size for title */
+    font-weight: 700; /* Bold font for title */
+    margin-bottom: 0.5rem; /* Space below the title */
+    color: #1d4ed8; /* Dark blue color */
+}
+
+.movie-card-vote-average {
+    color: #4b5563; /* Gray color for vote average text */
+    font-size: 0.875rem; /* Small font size */
+}
+
+.movie-card-vote-label {
+    font-weight: 600; /* Semi-bold for the "Vote Average:" label */
+}
+
+/* Optional: Dark mode adjustments for a cohesive theme if your app supports it */
+/* To enable these, your root HTML element (or a parent) would need a 'dark' class */
+.dark .movie-card {
+    background-color: #374151; /* Darker gray background */
+    border-color: #4b5563; /* Darker gray border */
+}
+
+.dark .movie-card-poster-fallback {
+    background-color: #4b5563; /* Darker gray background */
+    color: #9ca3af; /* Lighter gray text */
+}
+
+.dark .movie-card-title {
+    color: #93c5fd; /* Lighter blue color */
+}
+
+.dark .movie-card-vote-average {
+    color: #d1d5db; /* Lighter gray text */
+}

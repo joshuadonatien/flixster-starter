@@ -1,5 +1,5 @@
 import React from 'react';
-
+import "./MovieCard.css"
 // MovieCard: This component is the blueprint for how a single movie should be displayed.
 // It receives a 'movie' object as a prop and displays its title, poster, and vote average.
 const MovieCard = ({ movie }) => {
@@ -7,12 +7,12 @@ const MovieCard = ({ movie }) => {
   const IMAGE_BASE_URL = 'https://image.tmdb.org/t/p/w500';
 
   return (
-    <div className="Movie-Card">
+    <div className="movie-card">
       {movie.poster_path ? (
         <img
           src={`${IMAGE_BASE_URL}${movie.poster_path}`}
           alt={movie.title}
-          className="m"
+          className="movie-card-poster"
           // Fallback for broken images
           onError={(e) => {
             e.target.onerror = null; // Prevent infinite loop
@@ -20,15 +20,15 @@ const MovieCard = ({ movie }) => {
           }}
         />
       ) : (
-        <div className="rounded-lg mb-4 w-full h-auto max-w-xs flex items-center justify-center bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400 text-lg font-semibold" style={{height: '300px'}}>
+        <div className="movie-card-poster-fallback">
           No Poster Available
         </div>
       )}
-      <h2 className="text-xl font-bold mb-2 text-blue-700 dark:text-blue-300">
+      <h2 className="movie-card-title">
         {movie.title}
       </h2>
-      <p className="text-gray-700 dark:text-gray-300 text-sm">
-        <strong className="font-semibold">Vote Average:</strong> {movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'}
+      <p className="movie-card-vote-average">
+        <strong className="movie-card-vote-label">Vote Average:</strong> {movie.vote_average ? movie.vote_average.toFixed(1) : 'N/A'}
       </p>
     </div>
   );
