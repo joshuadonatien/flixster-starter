@@ -1,105 +1,108 @@
+// src/Components/MovieSearchSort/MovieSearchSort.jsx
 import React, { useState } from "react";
-import MovieCard from "../MovieCard/MovieCard";
-import './MovieSearchSort.css'
+// FIX: Ensure explicit .css extension for the CSS import path.
+import './MovieSearchSort.css'; // Ensure this CSS file exists in the same directory as MovieSearchSort.jsx
+import axios from "axios"; // Ensure axios is imported if used for fetch
 
-const apiToken = import.meta.env.VITE_API_KEY
+// Define API token once (outside component or as a constant inside if preferred)
+// WARNING: The "import.meta" syntax relies on your build tool (e.g., Vite) correctly
+// injecting environment variables. Ensure your .env file is set up with VITE_API_KEY.
+const apiToken = import.meta.env.VITE_API_KEY;
 
-function MovieSearchSort() {
-    const [searchQuery, setSearchQuery] = useState ('');
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const[movies, setMovies] = useState([]);
-    // Define onSearchResults within this component's scope
-  const onSearchResults = (results) => {
-    // This function will handle the search results,
-    // e.g., update a state variable in MovieSearchSort,
-    // or pass them to another child component
-    setMovies(results); // <--- Key change: Update state
-    console.log("Search results received and set to state:", results);
-    // You would typically set a state here to display the results
-    // For example: setMovies(results);
-  };
+/**
+ * MovieSearchSort Component
+ * Handles user input for searching movies and triggers the search API call.
+ * It passes the search results and the query back to its parent component.
+ * @param {object} props - Component props.
+ * @param {function(Array<Object>, string): void} props.onSearch - Callback function to pass search results and query to the parent.
+ */
+function MovieSearchSort({ onSearch }) {
+   const [searchQuery, setSearchQuery] = useState('');
+   const [loading, setLoading] = useState(false);
+   const [error, setError] = useState(null);
 
+   // Handler for when the search input value changes
+   const handleSearchChange = (event) => {
+     setSearchQuery(event.target.value);
+   };
+  
+   // Handler for clearing the search input
+   const handleClearSearch = () => {
+       setSearchQuery('');
+       // When search is cleared, also inform the parent to clear results
+       // and potentially switch back to "Now Playing" mode
+       onSearch([], ''); // Pass empty array and empty query
+   };
 
-    const handleSearchChange = (event) => {
-    // 'event.target.value' gives you the current value of the input field
-    setSearchQuery(event.target.value);
-    console.log("Current search term:", event.target.value);
-    // You might also trigger a search API call here based on the new value
-  };
-    
-    const handleClearSearch = (event) =>{
-        setSearchQuery('');
-    }
-    const handleSubmit = async (event) => {
-    event.preventDefault(); // Prevent default form submission behavior (page reload)
-    setLoading(true);
-    setError(null);
-    try {
-      const encodedQuery = encodeURIComponent(searchQuery);
-      const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiToken}&query=${encodedQuery}&language=en-US`;
+   // Handler for form submission (when user clicks Search button or presses Enter)
+   const handleSubmit = async (event) => {
+       event.preventDefault(); // Prevent default form submission (page reload)
+       setLoading(true);
+       setError(null);
 
-      const response = await fetch(url);
+       // If search query is empty, treat it as a clear search
+       if (searchQuery.trim() === '') {
+           handleClearSearch();
+           setLoading(false);
+           return;
+       }
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! Status: ${response.status}`);
-      }
+       try {
+           const encodedQuery = encodeURIComponent(searchQuery);
+           const url = `https://api.themoviedb.org/3/search/movie?api_key=${apiToken}&query=${encodedQuery}&language=en-US`;
 
-      const data = await response.json();
+           // Using axios here for consistency with MovieList, but native fetch works too
+           const response = await axios.get(url); 
 
-      // Pass the results back up to the parent component
-      // The `results` array will contain movie objects if found, or be empty.
-      console.log(data);
-      onSearchResults(data.results || []);
+           // Ensure the response is OK before processing
+           if (response.status !== 200) {
+             throw new Error(`HTTP error! Status: ${response.status}`);
+           }
 
-    } catch (err) {
-      console.error("Failed to fetch movies:", err);
-      setError("Failed to load movies. Please try again later.");
-      onSearchResults([]); // Clear previous results on error
-    } finally {
-      setLoading(false);
-    }
-  };
+           const data = response.data; // Axios automatically parses JSON to data.data
 
-  return (
-    <div>
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        value={searchQuery}
-        onChange={handleSearchChange}
-        placeholder="Search for a movie..."
-      />
-      <button type="submit">Search</button>
-        <button type="button" onClick={handleClearSearch}>Clear</button>
-      </form>
-{/* Loading and Error Message Section */}
-      {loading && <p className="">Loading movies...</p>}
-      {error && <p className="">{error}</p>}
+           // Pass the results and the original query back to the parent component
+           onSearch(data.results || [], searchQuery);
 
-      {/* Movie Results Display Section */}
-      <div className="">
-        {/* Check if there are movies in the 'movies' state array */}
-        {movies.length > 0 ? (
-          // Map over the 'movies' array to render a MovieCard for each movie
-          movies.map(movie => (
-            // The 'key' prop is essential for list rendering in React
-            // The 'movie' prop passes the individual movie object to MovieCard
-            <MovieCard key={movie.id} movie={movie} />
-          ))
-        ) : (
-          // Display a message if no movies are found, and we're not loading, not in an error state, and a search query exists
-          !loading && !error && searchQuery && (
-            <p className="">No movies found for "{searchQuery}".</p>
-          )
-        )}
-        {/* Display a prompt if no search has been performed yet */}
-        {!searchQuery && !loading && !error && movies.length === 0 && (
-            <p className="">Start by searching for a movie!</p>
-        )}
-      </div>
-      </div>
-  );
+       } catch (err) {
+           console.error("Failed to fetch movies:", err);
+           setError("Failed to load movies. Please try again later.");
+           // Pass empty results but retain query for error message context if needed in parent
+           onSearch([], searchQuery); 
+       } finally {
+           setLoading(false);
+       }
+   };
+
+   return (
+       <div className="p-4 bg-gray-700 rounded-lg shadow-md flex flex-col items-center">
+           <form onSubmit={handleSubmit} className="w-full max-w-md flex space-x-2 mb-4">
+               <input
+                   type="text"
+                   value={searchQuery}
+                   onChange={handleSearchChange}
+                   placeholder="Search for a movie..."
+                   className="flex-grow p-2 rounded-md border border-gray-600 bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-red-500"
+               />
+               <button
+                   type="submit"
+                   className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+               >
+                   Search
+               </button>
+               <button
+                   type="button"
+                   onClick={handleClearSearch}
+                   className="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-400"
+               >
+                   Clear
+               </button>
+           </form>
+
+           {loading && <p className="text-blue-300 text-center">Loading movies...</p>}
+           {error && <p className="text-red-400 text-center">{error}</p>}
+       </div>
+   );
 }
- 
-  export default MovieSearchSort;
+
+export default MovieSearchSort;
