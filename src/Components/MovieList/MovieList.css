@@ -1,0 +1,104 @@
+.movie-list {
+  display: grid;
+  /* Default: Large Desktops - auto-fill with a base min-width */
+  /* This allows many columns but ensures cards don't get too small initially */
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem; /* Consistent gap for all sizes */
+  padding: 1rem; /* Consistent padding for all sizes */
+  justify-content: center;
+  background-color: transparent;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.message-text {
+  width: 100%;
+  text-align: center;
+  font-size: 1.2rem;
+  color: #a0aec0;
+  margin-top: 50px;
+}
+
+.load-more-section {
+  width: 100%;
+  text-align: center;
+  margin-top: 40px;
+}
+
+.loading-message,
+.no-more-message {
+  color: #a0aec0;
+  font-size: 1rem;
+  margin-top: 10px;
+}
+
+.load-more-button {
+  align-items: center;
+  padding: 12px 25px;
+  font-size: 1.1rem;
+  background-color: #e53e3e;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.load-more-button:hover:not(:disabled) {
+  background-color: #c53030;
+}
+
+.load-more-button:disabled {
+  background-color: #718096;
+  cursor: not-allowed;
+}
+
+/* --- Responsive Adjustments --- */
+
+/* Tablets (max-width: 1023px) */
+@media (max-width: 1023px) {
+    .movie-list {
+        /* Allow cards to be smaller to fit more columns if possible, but no less than 130px */
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 0.8rem;
+        padding: 0.8rem;
+        max-width: 800px;
+        
+    }
+    .message-text {
+        font-size: 1.1rem;
+    }
+    .load-more-button {
+        padding: 10px 20px;
+        font-size: 1rem;
+    }
+}
+
+/* Phones (max-width: 767px) */
+@media (max-width: 767px) {
+    .movie-list {
+        /* On phones, ensure at least 2 columns, shrinking min-width if needed */
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 0.6rem;
+        padding: 0.6rem;
+        max-width: 400px;
+    }
+    .message-text {
+        font-size: 1rem;
+    }
+    .load-more-button {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Small Phones (max-width: 479px) - For very narrow screens, allow cards to be even smaller to fit 2-3 columns */
+@media (max-width: 479px) {
+    .movie-list {
+        grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); /* Further reduce min-width */
+        gap: 0.5rem;
+        padding: 0.5rem;
+        max-width: 250px;
+    }
+}

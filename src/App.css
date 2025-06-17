@@ -1,28 +1,88 @@
+body {
+    margin: 0;
+    font-family: "Inter", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    box-sizing: border-box; /* Ensures padding and border are included in element's total width and height */
+}
+
 .App {
-  text-align: center;
+    background-color: #1a202c; /* Dark background for the app */
+    min-height: 200vh; /* Ensure it takes full viewport height */
+    color: #e2e8f0; /* Light text color */
+    display: flex;
+    flex-direction: column;
 }
 
 .App-header {
-  background-color: #282c34;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-evenly;
-  color: white;
-  padding: 20px;
+    background-color: #2d3748; /* Slightly lighter dark for header */
+    padding: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+    margin-bottom: 2rem;
 }
 
-@media (max-width: 600px) {
-  .movie-card {
-    width: 100%;
-  }
+.App-header h1 {
+    color: #ef4444; /* Red color for title */
+    font-size: 2.25rem; /* 3xl */
+    font-weight: 700; /* bold */
+    text-align: center;
+    margin-bottom: 1rem;
+}
 
-  .search-bar {
-    flex-direction: column;
-    gap: 10px;
-  }
+.container {
+    max-width: 1280px; /* Equivalent to mx-auto */
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    flex-grow: 1; /* Allows main content to grow */
+}
 
-  .search-bar form {
-    flex-direction: column;
-  }
+/* --- Responsive Adjustments --- */
+
+/* Tablets (max-width: 1023px) */
+@media (max-width: 1023px) {
+    .App-header {
+        padding: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+    .App-header h1 {
+        font-size: 2rem; /* Slightly smaller title */
+    }
+    .container {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+}
+
+/* Phones (max-width: 767px) */
+@media (max-width: 767px) {
+    .App-header {
+        padding: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .App-header h1 {
+        font-size: 1.75rem; /* Even smaller title */
+    }
+    .container {
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+    }
+}
+
+/* Small Phones (max-width: 479px) */
+@media (max-width: 479px) {
+    .App-header {
+        padding: 0.4rem;
+        margin-bottom: 0.8rem;
+    }
+    .App-header h1 {
+        font-size: 1.5rem;
+    }
+    .container {
+        padding-left: 0.4rem;
+        padding-right: 0.4rem;
+    }
 }

@@ -1,0 +1,203 @@
+/* src/Components/MovieSearchSort/MovieSearchSort.css */
+
+.movie-search-sort-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Space between elements */
+    justify-content: center;
+    align-items: center;
+    padding: 20px 15px; /* Increased padding for a thicker bar */
+    background-color: #1A202C;
+    border-bottom: 2px solid #333;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    margin-top: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.search-form {
+    display: flex;
+    gap: 0;
+    width: 100%;
+    max-width: 450px;
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: #2D3748;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.search-input {
+    flex-grow: 1;
+    padding: 12px 18px;
+    border: none;
+    background-color: transparent;
+    color: #cbd5e0;
+    font-size: 1.05rem;
+    outline: none;
+}
+
+.search-input::placeholder {
+    color: #a0aec0;
+}
+
+.clear-search-button {
+    padding: 12px 15px;
+    background-color: #1A202C;
+    color: #cbd5e0;
+    border: none;
+    border-right: 1px solid #4a5568;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    flex-shrink: 0;
+}
+
+.clear-search-button:hover {
+    background-color: #2D3748;
+    color: #e2e8f0;
+}
+
+.search-button {
+    padding: 12px 20px;
+    background-color: #E53E3E;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    flex-shrink: 0;
+}
+
+.search-button:hover {
+    background-color: #C53030;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.control-group label {
+    font-weight: bold;
+    color: #E2E8F0;
+    white-space: nowrap;
+    font-size: 1rem;
+}
+
+.sort-select,
+.genre-select {
+    padding: 10px 15px;
+    border: 1px solid #4a5568;
+    border-radius: 6px;
+    background-color: #2D3748;
+    color: #cbd5e0;
+    font-size: 1rem;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23cbd5e0" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 20px;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+    transition: border-color 0.2s ease;
+}
+
+.sort-select:focus,
+.genre-select:focus {
+    outline: none;
+    border-color: #63b3ed;
+    box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.5);
+}
+
+/* --- Responsive Adjustments --- */
+
+/* Tablets (max-width: 1023px) */
+@media (max-width: 1023px) {
+    .movie-search-sort-controls {
+        gap: 15px;
+        padding: 15px;
+    }
+    .search-form {
+        max-width: 400px;
+    }
+    .search-input {
+        padding: 10px 15px;
+        font-size: 1rem;
+    }
+    .clear-search-button,
+    .search-button {
+        padding: 10px 15px;
+        font-size: 0.95rem;
+    }
+    .control-group {
+        gap: 8px;
+    }
+    .control-group label {
+        font-size: 0.95rem;
+    }
+    .sort-select,
+    .genre-select {
+        padding: 8px 12px;
+        font-size: 0.95rem;
+        background-position: right 8px center;
+        background-size: 18px;
+    }
+}
+
+/* Phones (max-width: 767px) */
+@media (max-width: 767px) {
+    .movie-search-sort-controls {
+        flex-direction: column; /* Stack items vertically */
+        align-items: stretch; /* Stretch items to full width */
+        padding: 15px;
+        gap: 15px; /* Gap between stacked items */
+    }
+    .search-form {
+        max-width: 100%; /* Take full width */
+    }
+    .control-group {
+        width: 100%; /* Take full width */
+        justify-content: space-between; /* Space out label and select */
+    }
+    .search-input {
+        padding: 10px 12px;
+        font-size: 0.9rem;
+    }
+    .clear-search-button,
+    .search-button {
+        padding: 10px 12px;
+        font-size: 0.85rem;
+    }
+    .control-group label {
+        font-size: 0.9rem;
+    }
+    .sort-select,
+    .genre-select {
+        padding: 8px 10px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Small Phones (max-width: 479px) - Further adjustments for very small screens */
+@media (max-width: 479px) {
+    .movie-search-sort-controls {
+        padding: 10px;
+        gap: 10px;
+    }
+    .search-input,
+    .clear-search-button,
+    .search-button,
+    .sort-select,
+    .genre-select {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+    }
+    .control-group label {
+        font-size: 0.8rem;
+    }
+}
