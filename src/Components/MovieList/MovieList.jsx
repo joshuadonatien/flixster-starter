@@ -1,34 +1,67 @@
-import React, { useState, useEffect, useRef } from "react";
-import axios from "axios";
-import MovieCard from "../MovieCard/MovieCard";
-import MovieModal from "../MovieModal/MovieModal";
-import './MovieList.css'; // Ensure you have this CSS file
+import React, { useState, useEffect } from "react"; // Removed useRef import
+import axios from "axios"; // Import Axios for HTTP requests
+import MovieCard from "../MovieCard/MovieCard"; // Import MovieCard component
+import MovieModal from "../MovieModal/MovieModal"; // Import MovieModal component
+import './MovieList.css'; // Import component-specific styles
 
-// MovieList now accepts 'movies' prop (for search results) and 'showLoadMore' prop
+/**
+ * MovieList Component
+ * This component is responsible for displaying a list of movies.
+ * It can operate in two modes:
+ * 1. "Now Playing" mode: It fetches and paginates movies internally based on sort/genre props.
+ * 2. Search results mode: It displays movies passed as a prop from the parent (App.jsx).
+ * It also handles opening a modal to show movie details.
+ */
 const MovieList = ({ movies: externalMovies = [], showLoadMore, currentSearchQuery, sortBy, genre }) => {
-    const [internalMovies, setInternalMovies] = useState([]); // Movies fetched internally (Now Playing)
-    const [page, setPage] = useState(1); // Current page for internal fetching
-    const [hasMoreMovies, setHasMoreMovies] = useState(true); // For "Now Playing" pagination
-    const [loading, setLoading] = useState(false); // Loading state for internal fetches
-    const [showModal, setShowModal] = useState(false); // Modal visibility
-    const [selectedMovie, setSelectedMovie] = useState(null); // Movie for the modal
+    // --- State Variables ---
 
+    // `internalMovies` stores the list of movies fetched when in "Now Playing" mode.
+    const [internalMovies, setInternalMovies] = useState([]);
+
+    // `page` tracks the current page number for pagination in "Now Playing" mode.
+    const [page, setPage] = useState(1);
+
+    // `hasMoreMovies` indicates if there are more pages of "Now Playing" movies to load.
+    const [hasMoreMovies, setHasMoreMovies] = useState(true);
+
+    // `loading` is a boolean flag to indicate if a movie fetch operation is in progress.
+    // Used to show loading messages and disable the "Load More" button.
+    const [loading, setLoading] = useState(false);
+
+    // `showModal` controls the visibility of the MovieModal.
+    const [showModal, setShowModal] = useState(false);
+
+    // `selectedMovie` stores the detailed information of the movie selected for the modal.
+    const [selectedMovie, setSelectedMovie] = useState(null);
+
+    // API Key for TMDb.
     const apiToken = import.meta.env.VITE_API_KEY || 'YOUR_TMDB_API_KEY';
 
-    // Ref to track if sortBy or genre has genuinely changed to trigger a reset
-    const prevSortByRef = useRef(sortBy);
-    const prevGenreRef = useRef(genre);
-
-    // This variable determines which movie array is rendered
+    // This variable determines which array of movies is actually rendered.
+    // If `showLoadMore` is true (Now Playing mode), we use `internalMovies`.
+    // Otherwise (search results mode), we use `externalMovies` passed from App.jsx.
     const moviesToDisplay = showLoadMore ? internalMovies : externalMovies;
 
-    // Effect to fetch "Now Playing" movies
+    // --- useEffect Hook for "Now Playing" Movie Fetching ---
+
+    /**
+     * useEffect to fetch "Now Playing" movies.
+     * This effect is triggered when:
+     * - The component first mounts (if `showLoadMore` is true).
+     * - The `page` state changes (when "Load More" is clicked).
+     * - The `sortBy` prop changes.
+     * - The `genre` prop changes.
+     * - The `showLoadMore` prop changes (e.g., switching from search to Now Playing).
+     *
+     * Dependencies: [page, showLoadMore, sortBy, genre, apiToken] - Ensures it re-runs when any of these change.
+     */
     useEffect(() => {
-        // Only run this effect if in "Now Playing" mode
-        if (showLoadMore) {
+
+      if (showLoadMore) {
             const fetchNowPlayingMovies = async () => {
-                setLoading(true); // Set loading true when starting fetch
+                setLoading(true); 
                 try {
+
                     let url = `https://api.themoviedb.org/3/discover/movie?api_key=${apiToken}&page=${page}`;
 
                     if (sortBy) {
@@ -38,123 +71,155 @@ const MovieList = ({ movies: externalMovies = [], showLoadMore, currentSearchQue
                         url += `&with_genres=${genre}`;
                     }
 
+                    
                     const response = await axios.get(url);
 
-                    // If sort/genre changed, or it's the first page (new criteria or initial load)
-                    const isNewCriteria = (sortBy !== prevSortByRef.current || genre !== prevGenreRef.current);
-
-                    if (page === 1 || isNewCriteria) {
-                        setInternalMovies(response.data.results); // Replace for first page or new criteria
-                        setPage(1); // Ensure page is reset for new criteria
-                        prevSortByRef.current = sortBy; // Update refs
-                        prevGenreRef.current = genre;
+                    // Logic for updating internalMovies:
+                    // If it's the first page (page === 1), replace the existing movies.
+                    // This handles initial load and also resets the list when sortBy/genre changes
+                    // (since App.jsx resets `page` to 1 when sortBy/genre changes).
+                    if (page === 1) {
+                        setInternalMovies(response.data.results);
+                        // No explicit page reset here as it's assumed App.jsx sets page to 1
+                        // before these props trigger this effect for new sort/genre criteria.
                     } else {
-                        setInternalMovies(prevMovies => [...prevMovies, ...response.data.results]); // Append for subsequent pages
+                        // If it's a subsequent page (Load More), append the new results to the existing ones.
+                        setInternalMovies(prevMovies => [...prevMovies, ...response.data.results]);
                     }
 
-                    // Determine if there are more pages
+                    // Update `hasMoreMovies` based on the total pages from the API response.
+                    // `response.data.results.length === 0` also handles cases where a filter yields no results.
                     setHasMoreMovies(response.data.page < response.data.total_pages && response.data.results.length > 0);
 
                 } catch (err) {
                     console.error("Error fetching now playing movies:", err);
                     setHasMoreMovies(false); // Disable load more on error
-                    if (page === 1) { // Clear movies on error for initial/new criteria fetch
-                        setInternalMovies([]);
+                    if (page === 1) {
+                        setInternalMovies([]); // Clear movies on error for initial/new criteria fetch
                     }
                 } finally {
-                    setLoading(false); // Set loading false after fetch completes
+                    setLoading(false); // Indicate that loading has finished
                 }
             };
             fetchNowPlayingMovies();
         }
-        // Dependencies: re-run when 'page', 'showLoadMore', 'sortBy', or 'genre' changes
-    }, [page, showLoadMore, sortBy, genre, apiToken]);
+    }, [page, showLoadMore, sortBy, genre, apiToken]); // Effect dependencies
 
-    // This useEffect handles resetting the page/movies when sortBy/genre changes in App.jsx
-    // and showLoadMore is true, ensuring a fresh fetch from page 1.
-    useEffect(() => {
-        if (showLoadMore && (sortBy !== prevSortByRef.current || genre !== prevGenreRef.current)) {
-            // Only reset if a change in sort/genre is detected that wasn't initiated by load more
-            // and we are in "Now Playing" mode.
-            if (page !== 1) { // If not already on page 1, reset it
-                setPage(1);
-            } else { // If already on page 1, trigger the fetch immediately as useEffect dependency won't fire for page=1 changing to page=1
-                 // We don't need to manually trigger fetch here, as the main useEffect for [page, sortBy, genre] will handle it
-                 // once page is set to 1. The `isNewCriteria` in the main effect will handle the replacement logic.
-                 // This block is mostly for ensuring the visual state (clearing movies) before the fetch happens.
-                 setInternalMovies([]); // Clear movies for visual feedback
-            }
-        }
-    }, [sortBy, genre, showLoadMore, page]);
-
-
-    // Handler for "Load More" button
+    /**
+     * handleLoadMore
+     * Callback function for the "Load More" button.
+     * Increments the `page` state, which in turn triggers the `useEffect`
+     * to fetch the next page of "Now Playing" movies.
+     * It prevents multiple rapid clicks while loading or if no more movies are available.
+     */
     const handleLoadMore = () => {
-        if (!loading && hasMoreMovies) {
+        if (!loading && hasMoreMovies) { // Only load more if not already loading and more movies exist
             setPage(prevPage => prevPage + 1); // Increment page to trigger useEffect
         }
     };
 
-    // Handler for clicking a MovieCard to show modal
+    /**
+     * handleCardClick
+     * Callback function for when a MovieCard is clicked.
+     * It opens the MovieModal and fetches detailed information (including trailers)
+     * for the selected movie.
+     *
+     * @param {number} movieId - The ID of the clicked movie.
+     */
     const handleCardClick = async (movieId) => {
-        setShowModal(true);
-        setSelectedMovie(null); // Clear previous movie while loading new one
+        setShowModal(true); 
+        setSelectedMovie(null); 
         try {
-            const { data } = await axios.get(
+            const movieDetailsResponse = await axios.get(
                 `https://api.themoviedb.org/3/movie/${movieId}?api_key=${apiToken}`
             );
-            setSelectedMovie(data); // Set the full movie details
+            const movieDetails = movieDetailsResponse.data;
+
+            const movieVideosResponse = await axios.get(
+                `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${apiToken}`
+            );
+            const videos = movieVideosResponse.data.results;
+
+            const trailer = videos.find(
+                (vid) => vid.site === "YouTube" && vid.type === "Trailer" && vid.official === true
+            );
+
+            const fallbackTrailer = videos.find(
+                (vid) => vid.site === "YouTube" && vid.type === "Trailer"
+            );
+
+            const trailerUrl = trailer
+                ? `https://www.youtube.com/watch?v=${trailer.key}`
+                : fallbackTrailer
+                ? `https://www.youtube.com/watch?v=${fallbackTrailer.key}`
+                : null;
+
+            setSelectedMovie({ ...movieDetails, trailerUrl });
+
         } catch (err) {
-            console.error(`Error fetching movie details for ID ${movieId}:`, err);
-            setShowModal(false); // Close modal or handle error display
+            console.error(`Error fetching movie details/videos for ID ${movieId}:`, err);
+            setShowModal(false); // Hide modal on error
         }
     };
 
-    // Handler for closing the modal
+    /**
+     * handleCloseModal
+     * Closes the MovieModal and clears the selected movie details.
+     */
     const handleCloseModal = () => {
-        setShowModal(false);
-        setSelectedMovie(null); // Clear selected movie when closing
+        setShowModal(false); // Hide the modal
+        setSelectedMovie(null); // Clear selected movie details
     };
+
+    // --- JSX (UI Rendering) ---
 
     return (
         <div className="movie-list">
+            {/* Conditional rendering of movie cards or messages */}
             {moviesToDisplay.length > 0 ? (
+                // Map through the moviesToDisplay array and render a MovieCard for each movie
                 moviesToDisplay.map(m => (
                     <MovieCard
-                        key={m.id}
-                        movie={m} // Pass the entire movie object
-                        onClick={() => handleCardClick(m.id)} // Pass the movie ID
+                        key={m.id} // Unique key for React list rendering optimization
+                        movie={m} // Pass the entire movie object as prop
+                        onClick={() => handleCardClick(m.id)} // Pass callback for card click
                     />
                 ))
             ) : (
-                // Conditional message based on mode and state
+                // Display messages based on current mode (Now Playing vs. Search) and loading state
                 <p className="message-text">
-                    {showLoadMore ?
-                        (loading ? "Loading now playing movies..." : "No now playing movies to show with current filters/sort.") :
-                        (loading ? "Searching..." : (externalMovies.length === 0 && currentSearchQuery && currentSearchQuery.trim() !== '') ? "No search results found. Try a different search term." : (currentSearchQuery ? "" : "Search for a movie above to get started."))
+                    {showLoadMore ? // If in "Now Playing" mode
+                        (loading ? "Loading now playing movies..." : "No now playing movies to show with current filters/sort.") : // Messages for Now Playing
+                        (loading ? "Searching..." : // If in Search mode and loading
+                            (externalMovies.length === 0 && currentSearchQuery && currentSearchQuery.trim() !== '') ?
+                                "No search results found. Try a different search term." : // No search results for a non-empty query
+                                (currentSearchQuery ? "" : "Search for a movie above to get started.") // Initial message or no query
+                        )
                     }
                 </p>
             )}
 
-            {/* The "Load More" button and its messages - only shown if showLoadMore is true */}
+            {/* "Load More" section, only shown if in "Now Playing" mode */}
             {showLoadMore && (
                 <div className="load-more-section">
-                    {loading && <p className="loading-message">Loading more...</p>}
-                    {hasMoreMovies && !loading && (
+                    {loading && <p className="loading-message">Loading more...</p>} {/* Loading indicator */}
+                    {hasMoreMovies && !loading && ( // Show button if more movies and not loading
                         <button onClick={handleLoadMore} className="load-more-button">Load More</button>
                     )}
+                    {/* Message when all movies are loaded and no more pages */}
                     {!hasMoreMovies && !loading && moviesToDisplay.length > 0 && <p className="no-more-message">You've reached the end of the movies.</p>}
                 </div>
             )}
 
-            {/* MovieModal component */}
+            {/* MovieModal Component */}
+            {/* Renders the modal if `showModal` is true */}
             <MovieModal
-                show={showModal}
-                onClose={handleCloseModal}
-                movie={selectedMovie}
+                show={showModal} // Control modal visibility
+                onClose={handleCloseModal} // Callback to close modal
+                movie={selectedMovie} // Movie details to display in the modal
             />
         </div>
     );
 };
 
-export default MovieList;
+export default MovieList; // Export the component

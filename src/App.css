@@ -40,49 +40,66 @@ body {
     flex-grow: 1; /* Allows main content to grow */
 }
 
+/* New Banner Section Styling */
+.App-banner-section {
+    /* The MovieSearchSort component already has a dark background. */
+    /* This section acts as a container, providing the necessary margin below it. */
+    /* Padding is handled by MovieSearchSort itself. */
+    margin-bottom: 2rem; /* Add margin below the banner section */
+    width: 100%; /* Ensure it spans full width */
+    box-sizing: border-box; /* Include padding/border in total width */
+}
+
+/* Footer Section Styling */
+.App-footer {
+    background-color: #2d3748; /* Same background as header for consistency */
+    padding: 1rem; /* Padding for the footer content */
+    text-align: center; /* Center the text */
+    color: #a0aec0; /* Lighter gray for footer text */
+    font-size: 0.875rem; /* Small text size (sm) */
+    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1); /* Shadow at the top of the footer */
+    /* mt-auto from App.jsx's footer class works with flex-grow on main to push footer to bottom */
+}
+
+
 /* --- Responsive Adjustments --- */
+/* Ensure banner and footer margins/padding adjust on smaller screens */
 
 /* Tablets (max-width: 1023px) */
 @media (max-width: 1023px) {
-    .App-header {
-        padding: 0.75rem;
+    /* ... (existing App-header, h1, container adjustments) ... */
+
+    .App-banner-section {
         margin-bottom: 1.5rem;
     }
-    .App-header h1 {
-        font-size: 2rem; /* Slightly smaller title */
-    }
-    .container {
-        padding-left: 0.75rem;
-        padding-right: 0.75rem;
+    .App-footer {
+        padding: 0.75rem;
+        font-size: 0.8rem;
     }
 }
 
 /* Phones (max-width: 767px) */
 @media (max-width: 767px) {
-    .App-header {
-        padding: 0.5rem;
+    /* ... (existing App-header, h1, container adjustments) ... */
+
+    .App-banner-section {
         margin-bottom: 1rem;
     }
-    .App-header h1 {
-        font-size: 1.75rem; /* Even smaller title */
-    }
-    .container {
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
+    .App-footer {
+        padding: 0.5rem;
+        font-size: 0.75rem;
     }
 }
 
 /* Small Phones (max-width: 479px) */
 @media (max-width: 479px) {
-    .App-header {
-        padding: 0.4rem;
+    /* ... (existing App-header, h1, container adjustments) ... */
+
+    .App-banner-section {
         margin-bottom: 0.8rem;
     }
-    .App-header h1 {
-        font-size: 1.5rem;
-    }
-    .container {
-        padding-left: 0.4rem;
-        padding-right: 0.4rem;
+    .App-footer {
+        padding: 0.4rem;
+        font-size: 0.7rem;
     }
 }
